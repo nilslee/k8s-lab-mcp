@@ -12,3 +12,5 @@ spring:
         stdio: false
         type: sync
 
+server:
+  port: 9000

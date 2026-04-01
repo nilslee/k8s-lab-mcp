@@ -31,7 +31,7 @@ ENV SPRING_PROFILES_ACTIVE=runner
 
 USER mcp
 
-EXPOSE 8080
+EXPOSE 9000
 
 # -Xmx384m keeps the JVM under the 512m container memory limit
 ENTRYPOINT ["java", "-Xmx384m", "-jar", "app.jar"]
