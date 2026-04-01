@@ -1,3 +1,14 @@
 spring:
   application:
     name: mcp
+
+  # MCP Server Configuration
+  ai:
+    mcp:
+      server:
+        name: mcp
+        version: 0.1.1
+        protocol: streamable
+        stdio: false
+        type: sync
+
