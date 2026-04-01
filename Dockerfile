@@ -1,9 +1,8 @@
 # syntax=docker/dockerfile:1
 
 # ── Build stage ───────────────────────────────────────────────────────────────
-# Uses the Maven + Eclipse Temurin JDK 26 image.
-# If eclipse-temurin:26-jdk-jammy is not yet available, substitute with 21.
-FROM eclipse-temurin:26-jdk-jammy AS build
+# Java 26 does not exist yet. Use Java 21 (current LTS).
+FROM eclipse-temurin:25-jdk-jammy AS build
 
 WORKDIR /build
 
@@ -16,7 +15,7 @@ COPY src ./src
 RUN ./mvnw package -DskipTests -B
 
 # ── Runtime stage ─────────────────────────────────────────────────────────────
-FROM eclipse-temurin:26-jre-jammy
+FROM eclipse-temurin:25-jre-jammy
 
 WORKDIR /app
 
