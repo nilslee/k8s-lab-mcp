@@ -14,3 +14,9 @@ spring:
 
 server:
   port: 9000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info # Or use '*' to expose all
