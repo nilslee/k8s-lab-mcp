@@ -19,6 +19,16 @@ FROM eclipse-temurin:25-jre-jammy
 
 WORKDIR /app
 
+# kubectl for scripts under scripts/cluster-resources/; respects KUBECONFIG=/app/kubeconfig (bind-mounted)
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl \
+  && KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt | tr -d '\n')" \
+  && ARCH="$(dpkg --print-architecture)" \
+  && curl -fsSL -o /usr/local/bin/kubectl \
+       "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+  && chmod +x /usr/local/bin/kubectl \
+  && rm -rf /var/lib/apt/lists/*
+
 RUN groupadd -r mcp && useradd -r -g mcp mcp
 
 COPY --from=build /build/target/mcp-*.jar app.jar
