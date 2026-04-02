@@ -26,8 +26,7 @@ COPY --from=build /build/target/mcp-*.jar app.jar
 # Shell scripts used by MCP tools (entire tree, including subdirs e.g. scripts/cluster-resources/)
 COPY scripts ./scripts
 RUN find scripts -type f -name "*.sh" -exec chmod +x {} + \
-  && chown -R mcp:mcp scripts \
-  && test -f scripts/cluster-resources/cluster-status.sh
+  && chown -R mcp:mcp scripts
 
 # Kubeconfig is bind-mounted at /app/kubeconfig at runtime (read-only)
 ENV KUBECONFIG=/app/kubeconfig
