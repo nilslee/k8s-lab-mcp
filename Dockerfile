@@ -23,10 +23,11 @@ RUN groupadd -r mcp && useradd -r -g mcp mcp
 
 COPY --from=build /build/target/mcp-*.jar app.jar
 
-# Shell scripts used by MCP tools (e.g. SystemTools); must exist under /app/scripts
+# Shell scripts used by MCP tools (entire tree, including subdirs e.g. scripts/cluster-resources/)
 COPY scripts ./scripts
 RUN find scripts -type f -name "*.sh" -exec chmod +x {} + \
-  && chown -R mcp:mcp scripts
+  && chown -R mcp:mcp scripts \
+  && test -f scripts/cluster-resources/cluster-status.sh
 
 # Kubeconfig is bind-mounted at /app/kubeconfig at runtime (read-only)
 ENV KUBECONFIG=/app/kubeconfig
