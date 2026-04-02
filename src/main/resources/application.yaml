@@ -19,4 +19,15 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info # Or use '*' to expose all
+        include: health,info
+
+mcp:
+  kubernetes:
+    # Optional allowlist. Empty = allow all namespaces the kubeconfig can read.
+    # Example: allowed-namespaces: [default, kube-system, monitoring]
+    allowed-namespaces: []
+    # Maximum number of events returned by get-events tool.
+    max-events: 500
+    # Timeouts for Kubernetes API server communication.
+    connection-timeout: 10s
+    read-timeout: 30s
