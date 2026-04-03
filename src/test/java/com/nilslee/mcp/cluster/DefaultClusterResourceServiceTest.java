@@ -1,19 +1,18 @@
 package com.nilslee.mcp.cluster;
 
-import com.nilslee.mcp.cluster.format.ClusterResourceTextFormatter;
-import com.nilslee.mcp.cluster.query.ClusterResourceQueries;
-import com.nilslee.mcp.cluster.validation.ClusterResourceInputValidator;
-import com.nilslee.mcp.cluster.validation.InvalidClusterInputException;
+import com.nilslee.mcp.service.cluster.DefaultClusterResourceService;
+import com.nilslee.mcp.model.cluster.InvolvedObjectKind;
+import com.nilslee.mcp.model.cluster.PodPhaseFilter;
+import com.nilslee.mcp.service.cluster.format.ClusterResourceTextFormatter;
+import com.nilslee.mcp.service.cluster.query.ClusterResourceQueries;
+import com.nilslee.mcp.service.cluster.validation.ClusterResourceInputValidator;
+import com.nilslee.mcp.service.cluster.validation.InvalidClusterInputException;
 import com.nilslee.mcp.config.McpKubernetesProperties;
 import io.fabric8.kubernetes.api.model.Event;
-import io.fabric8.kubernetes.api.model.Namespace;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.Pod;
 import io.fabric8.kubernetes.api.model.PodBuilder;
-import io.fabric8.kubernetes.api.model.Service;
-import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetricsList;
-import io.fabric8.kubernetes.api.model.metrics.v1beta1.PodMetricsList;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

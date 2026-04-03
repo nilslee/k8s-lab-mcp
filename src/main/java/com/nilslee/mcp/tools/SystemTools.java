@@ -1,8 +1,8 @@
 package com.nilslee.mcp.tools;
 
-import com.nilslee.mcp.cluster.ClusterResourceService;
-import com.nilslee.mcp.cluster.InvolvedObjectKind;
-import com.nilslee.mcp.cluster.PodPhaseFilter;
+import com.nilslee.mcp.service.cluster.ClusterResourceService;
+import com.nilslee.mcp.model.cluster.InvolvedObjectKind;
+import com.nilslee.mcp.model.cluster.PodPhaseFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.annotation.McpTool;

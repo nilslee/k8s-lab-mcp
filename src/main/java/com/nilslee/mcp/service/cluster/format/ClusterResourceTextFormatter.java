@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster.format;
+package com.nilslee.mcp.service.cluster.format;
 
 import io.fabric8.kubernetes.api.model.Container;
 import io.fabric8.kubernetes.api.model.ContainerStatus;

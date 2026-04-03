@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster.validation;
+package com.nilslee.mcp.service.cluster.validation;
 
 import org.springframework.stereotype.Component;
 

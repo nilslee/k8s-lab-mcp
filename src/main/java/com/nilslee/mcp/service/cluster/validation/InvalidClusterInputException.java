@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster.validation;
+package com.nilslee.mcp.service.cluster.validation;
 
 /**
  * Thrown when a model-supplied input fails validation before any Kubernetes API call is made.

@@ -1,9 +1,11 @@
-package com.nilslee.mcp.cluster;
+package com.nilslee.mcp.service.cluster;
 
-import com.nilslee.mcp.cluster.format.ClusterResourceTextFormatter;
-import com.nilslee.mcp.cluster.query.ClusterResourceQueries;
-import com.nilslee.mcp.cluster.validation.ClusterResourceInputValidator;
-import com.nilslee.mcp.cluster.validation.InvalidClusterInputException;
+import com.nilslee.mcp.model.cluster.InvolvedObjectKind;
+import com.nilslee.mcp.model.cluster.PodPhaseFilter;
+import com.nilslee.mcp.service.cluster.format.ClusterResourceTextFormatter;
+import com.nilslee.mcp.service.cluster.query.ClusterResourceQueries;
+import com.nilslee.mcp.service.cluster.validation.ClusterResourceInputValidator;
+import com.nilslee.mcp.service.cluster.validation.InvalidClusterInputException;
 import com.nilslee.mcp.config.McpKubernetesProperties;
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.Pod;

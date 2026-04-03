@@ -1,5 +1,7 @@
 package com.nilslee.mcp.cluster.validation;
 
+import com.nilslee.mcp.service.cluster.validation.ClusterResourceInputValidator;
+import com.nilslee.mcp.service.cluster.validation.InvalidClusterInputException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;

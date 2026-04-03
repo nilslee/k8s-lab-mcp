@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster;
+package com.nilslee.mcp.model.cluster;
 
 /**
  * Typed enum for event involved-object kind to prevent prompt-injection via free-text kind strings.

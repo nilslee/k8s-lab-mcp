@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster;
+package com.nilslee.mcp.model.cluster;
 
 /**
  * Typed enum for pod phase filtering to prevent prompt-injection via free-text status strings.

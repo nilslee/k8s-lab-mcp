@@ -1,4 +1,4 @@
-package com.nilslee.mcp.cluster.query;
+package com.nilslee.mcp.service.cluster.query;
 
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.Namespace;

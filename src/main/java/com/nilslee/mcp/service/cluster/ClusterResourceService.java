@@ -1,5 +1,7 @@
-package com.nilslee.mcp.cluster;
+package com.nilslee.mcp.service.cluster;
 
+import com.nilslee.mcp.model.cluster.InvolvedObjectKind;
+import com.nilslee.mcp.model.cluster.PodPhaseFilter;
 import org.springframework.lang.Nullable;
 
 /**
