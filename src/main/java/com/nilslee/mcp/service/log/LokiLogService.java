@@ -7,7 +7,6 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +17,9 @@ import java.util.List;
  */
 @Service
 public class LokiLogService {
+
+  /** Lookback window for {@link #tailLogs}: Loki log queries require {@code query_range}, not instant query. */
+  private static final long TAIL_LOOKBACK_NANOS = 3600L * 1_000_000_000L;
 
   private final LogQueries logQueries;
   private final JsonMapper jsonMapper;
@@ -105,15 +107,39 @@ public class LokiLogService {
     }
   }
 
+  /**
+   * Latest log lines near an instant using {@code query_range} (backward). Loki rejects log selectors on
+   * instant {@code /query}; this uses a fixed lookback ending at {@code asOfEndNanos} (minus optional ingest
+   * lag).
+   */
   public String tailLogs(
       String query,
-      long timeNanos,
+      long asOfEndNanos,
       @Nullable Integer limit,
-      @Nullable LogDirection direction,
       @Nullable Integer delayForSeconds) {
     try {
-      String dir = direction != null ? direction.name().toLowerCase() : LogDirection.BACKWARD.name().toLowerCase();
-      return logQueries.query(query, timeNanos, limit, dir, delayForSeconds);
+      long delayNanos =
+          (delayForSeconds != null && delayForSeconds > 0)
+              ? delayForSeconds * 1_000_000_000L
+              : 0L;
+      long endNanos = asOfEndNanos - delayNanos;
+      if (endNanos < 0) {
+        endNanos = 0;
+      }
+      long startNanos = endNanos - TAIL_LOOKBACK_NANOS;
+      if (startNanos < 0) {
+        startNanos = 0;
+      }
+      if (startNanos >= endNanos) {
+        if (endNanos == 0) {
+          endNanos = 1;
+          startNanos = 0;
+        } else {
+          startNanos = endNanos - 1;
+        }
+      }
+      return logQueries.queryRange(
+          query, startNanos, endNanos, limit, LogDirection.BACKWARD.name().toLowerCase());
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }

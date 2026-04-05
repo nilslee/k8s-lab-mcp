@@ -44,12 +44,4 @@ public interface LogQueries {
       @RequestParam long end,
       @RequestParam(required = false) Integer limit,
       @RequestParam(required = false) String direction);
-
-  @GetExchange("/loki/api/v1/query")
-  String query(
-      @RequestParam String query,
-      @RequestParam("time") long timeNanos,
-      @RequestParam(required = false) Integer limit,
-      @RequestParam(required = false) String direction,
-      @RequestParam(value = "delay_for", required = false) Integer delayForSeconds);
 }

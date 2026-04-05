@@ -86,10 +86,10 @@ public class LogTools {
   /**
    * Exposes {@link LokiLogService#listLokiSeries(String, long, long, java.util.List)} to MCP clients.
    *
-   * @param streamSelector              primary LogQL stream selector (first {@code match[]} parameter)
-   * @param startNanosInclusive         range start (inclusive), nanoseconds
-   * @param endNanosInclusive           range end (inclusive), nanoseconds
-   * @param additionalStreamSelectors   optional extra selectors; each becomes another {@code match[]} (intersection)
+   * @param streamSelector            primary LogQL stream selector (first {@code match[]} parameter)
+   * @param startNanosInclusive       range start (inclusive), nanoseconds
+   * @param endNanosInclusive         range end (inclusive), nanoseconds
+   * @param additionalStreamSelectors optional extra selectors; each becomes another {@code match[]} (intersection)
    * @return Loki JSON response body as text for the model
    */
   @McpTool(
@@ -143,29 +143,33 @@ public class LogTools {
   }
 
   /**
-   * Exposes {@link LokiLogService#tailLogs(String, long, Integer, LogDirection, Integer)} to MCP clients
-   * ({@code GET /loki/api/v1/query} instant query, not live tail).
+   * Exposes {@link LokiLogService#tailLogs(String, long, Integer, Integer)} to MCP clients
+   * ({@code GET /loki/api/v1/query_range} with a fixed lookback ending at the given instant; not live tail).
    *
-   * @param query             full LogQL
-   * @param timeNanos         evaluation instant, nanoseconds
-   * @param limit             optional max entries
-   * @param direction         optional; {@code null} defaults to newest-first style ({@link LogDirection#BACKWARD})
-   * @param delayForSeconds   optional Loki {@code delay_for} (ingest lag), seconds
+   * @param query               full LogQL
+   * @param startNanosInclusive As-of end of the tail window (Unix ns); logs are fetched backward from this instant
+   * @param limit               optional max entries
+   * @param delayForSeconds     optional ingest lag: subtract this many seconds from the as-of instant before querying
    * @return Loki JSON response body as text for the model
    */
   @McpTool(
       name = "tail-logs",
       description =
           CONTEXT
-              + "Latest log snapshot at one instant (Unix ns time) with limit; optional delayForSeconds "
-              + "for ingest lag. Uses instant /query, not query_range or WebSocket tail.")
+              + "Newest log lines near one instant: Unix ns `startNanosInclusive` is the range end (as-of time); "
+              + "uses query_range with a 1h lookback and backward direction (Loki disallows log selectors on "
+              + "instant /query). Optional delayForSeconds subtracts ingest lag from that end. Not WebSocket tail.")
   public String tailLogs(
       String query,
-      long timeNanos,
+      long startNanosInclusive,
       @Nullable Integer limit,
-      @Nullable LogDirection direction,
       @Nullable Integer delayForSeconds) {
-    log.debug("tail-logs query={} start={} delay={} direction={} start={} ", query, timeNanos, limit, direction, delayForSeconds);
-    return lokiLogService.tailLogs(query, timeNanos, limit, direction, delayForSeconds);
+    log.debug(
+        "tail-logs query={} asOfEndNanos={} limit={} delayForSeconds={}",
+        query,
+        startNanosInclusive,
+        limit,
+        delayForSeconds);
+    return lokiLogService.tailLogs(query, startNanosInclusive, limit, delayForSeconds);
   }
 }
