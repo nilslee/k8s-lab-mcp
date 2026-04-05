@@ -1,4 +1,4 @@
-package com.nilslee.mcp.config;
+package com.nilslee.mcp.config.cluster;
 
 import io.fabric8.kubernetes.client.Config;
 import io.fabric8.kubernetes.client.ConfigBuilder;
@@ -15,8 +15,8 @@ public class KubernetesClientConfiguration {
     @Bean
     public KubernetesClient kubernetesClient(McpKubernetesProperties props) {
         Config config = new ConfigBuilder()
-                .withConnectionTimeout((int) props.getConnectionTimeout().toMillis())
-                .withRequestTimeout((int) props.getReadTimeout().toMillis())
+                .withConnectionTimeout((int) props.connectionTimeout().toMillis())
+                .withRequestTimeout((int) props.readTimeout().toMillis())
                 .build();
         return new KubernetesClientBuilder().withConfig(config).build();
     }

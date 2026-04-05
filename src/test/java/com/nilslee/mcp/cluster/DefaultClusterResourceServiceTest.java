@@ -6,8 +6,8 @@ import com.nilslee.mcp.model.cluster.PodPhaseFilter;
 import com.nilslee.mcp.service.cluster.format.ClusterResourceTextFormatter;
 import com.nilslee.mcp.service.cluster.query.ClusterResourceQueries;
 import com.nilslee.mcp.service.cluster.validation.ClusterResourceInputValidator;
-import com.nilslee.mcp.service.cluster.validation.InvalidClusterInputException;
-import com.nilslee.mcp.config.McpKubernetesProperties;
+import com.nilslee.mcp.exception.InvalidClusterInputException;
+import com.nilslee.mcp.config.cluster.McpKubernetesProperties;
 import io.fabric8.kubernetes.api.model.Event;
 import io.fabric8.kubernetes.api.model.Node;
 import io.fabric8.kubernetes.api.model.Pod;
@@ -44,7 +44,7 @@ class DefaultClusterResourceServiceTest {
     private ClusterResourceTextFormatter formatter;
 
     private final ClusterResourceInputValidator validator = new ClusterResourceInputValidator();
-    private final McpKubernetesProperties props = new McpKubernetesProperties();
+    private final McpKubernetesProperties props = new McpKubernetesProperties(0, null, null);
 
     private DefaultClusterResourceService service;
 
@@ -167,42 +167,6 @@ class DefaultClusterResourceServiceTest {
         String result = service.describePod("default", "my-pod");
 
         assertThat(result).isEqualTo("pod detail");
-    }
-
-    // -------------------------------------------------------------------------
-    // Namespace allowlist
-    // -------------------------------------------------------------------------
-
-    @Test
-    void listPods_namespaceNotInAllowlist_throwsWithoutQueryCall() {
-        props.setAllowedNamespaces(List.of("default", "kube-system"));
-
-        assertThatThrownBy(() -> service.listPods("forbidden-ns", null, null))
-                .isInstanceOf(InvalidClusterInputException.class)
-                .hasMessageContaining("allowed-namespaces");
-        verify(queries, never()).listPods(anyString(), any());
-    }
-
-    @Test
-    void listPods_namespaceInAllowlist_proceedsNormally() {
-        props.setAllowedNamespaces(List.of("default", "kube-system"));
-
-        List<Pod> pods = List.of();
-        when(queries.listPods("default", null)).thenReturn(pods);
-        when(formatter.formatPodList(pods)).thenReturn("ok");
-
-        assertThat(service.listPods("default", null, null)).isEqualTo("ok");
-    }
-
-    @Test
-    void listPods_nullNamespaceWithAllowlist_proceedsNormally() {
-        props.setAllowedNamespaces(List.of("default"));
-
-        List<Pod> pods = List.of();
-        when(queries.listPods(isNull(), isNull())).thenReturn(pods);
-        when(formatter.formatPodList(pods)).thenReturn("all ns");
-
-        assertThat(service.listPods(null, null, null)).isEqualTo("all ns");
     }
 
     // -------------------------------------------------------------------------

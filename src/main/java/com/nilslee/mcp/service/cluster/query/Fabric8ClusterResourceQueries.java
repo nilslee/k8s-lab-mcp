@@ -11,7 +11,7 @@ import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetricsList;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.PodMetricsList;
 import io.fabric8.kubernetes.client.KubernetesClient;
-import org.springframework.lang.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
@@ -32,16 +32,19 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
         this.client = client;
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Node> listNodes() {
         return client.nodes().list().getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Namespace> listNamespaces() {
         return client.namespaces().list().getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Pod> listPods(@Nullable String namespace, @Nullable String labelSelector) {
         var resource = isBlank(namespace)
@@ -54,11 +57,13 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
         return resource.list().getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public Optional<Pod> getPod(String namespace, String podName) {
         return Optional.ofNullable(client.pods().inNamespace(namespace).withName(podName).get());
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Event> listEvents(@Nullable String namespace, @Nullable String involvedObjectKind,
                                   @Nullable String involvedObjectName, int limit) {
@@ -81,6 +86,7 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
                 : client.v1().events().inNamespace(namespace).list(opts).getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Deployment> listDeployments(@Nullable String namespace) {
         return isBlank(namespace)
@@ -88,6 +94,7 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
                 : client.apps().deployments().inNamespace(namespace).list().getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Service> listServices(@Nullable String namespace) {
         return isBlank(namespace)
@@ -95,11 +102,13 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
                 : client.services().inNamespace(namespace).list().getItems();
     }
 
+    /** {@inheritDoc} */
     @Override
     public NodeMetricsList topNodes() {
         return client.top().nodes().metrics();
     }
 
+    /** {@inheritDoc} */
     @Override
     public PodMetricsList topPods(@Nullable String namespace) {
         return isBlank(namespace)

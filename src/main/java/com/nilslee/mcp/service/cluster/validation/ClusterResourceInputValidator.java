@@ -1,5 +1,6 @@
 package com.nilslee.mcp.service.cluster.validation;
 
+import com.nilslee.mcp.exception.InvalidClusterInputException;
 import org.springframework.stereotype.Component;
 
 import java.util.regex.Pattern;
@@ -52,6 +53,8 @@ public class ClusterResourceInputValidator {
     /**
      * Validates an optional namespace parameter.
      * Null or blank is accepted (means "all namespaces").
+     *
+     * @param namespace candidate namespace or {@code null}/blank for all
      */
     public void validateNamespace(String namespace) {
         if (isBlankOrNull(namespace)) {
@@ -66,6 +69,8 @@ public class ClusterResourceInputValidator {
 
     /**
      * Validates a required namespace parameter.
+     *
+     * @param namespace must be non-blank and a valid DNS label
      */
     public void validateRequiredNamespace(String namespace) {
         if (isBlankOrNull(namespace)) {
@@ -76,6 +81,9 @@ public class ClusterResourceInputValidator {
 
     /**
      * Validates an optional resource name (pod, deployment, service, …).
+     *
+     * @param name      candidate name or {@code null}/blank to skip validation
+     * @param fieldName API field name for error messages
      */
     public void validateResourceName(String name, String fieldName) {
         if (isBlankOrNull(name)) {
@@ -90,6 +98,9 @@ public class ClusterResourceInputValidator {
 
     /**
      * Validates a required resource name.
+     *
+     * @param name      must be non-blank and a valid DNS subdomain
+     * @param fieldName API field name for error messages
      */
     public void validateRequiredResourceName(String name, String fieldName) {
         if (isBlankOrNull(name)) {
@@ -101,6 +112,8 @@ public class ClusterResourceInputValidator {
     /**
      * Validates an optional single-token label selector ({@code key=value}).
      * Commas and any complex expression are rejected.
+     *
+     * @param selector {@code null}, blank, or exactly one {@code key=value} token
      */
     public void validateLabelSelector(String selector) {
         if (isBlankOrNull(selector)) {
