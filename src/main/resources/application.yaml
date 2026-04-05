@@ -34,6 +34,10 @@ management:
         include: health,info
 
 mcp:
+  # When true (default), @McpTool methods that return JSON text rewrite a top-level data[] to a JSON string
+  # so Cursor / MCP Inspector keep the payload. Disable if you need raw Loki-style arrays.
+  tool-response:
+    serialize-top-level-data-json-array: true
   kubernetes:
     # Maximum number of events returned by get-events tool.
     max-events: 500

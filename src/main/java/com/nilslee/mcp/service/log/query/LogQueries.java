@@ -19,26 +19,26 @@ import java.util.List;
 public interface LogQueries {
 
   @GetExchange("/loki/api/v1/labels")
-  byte[] labels(
+  String labels(
       @RequestParam(required = false) Long start,
       @RequestParam(required = false) Long end,
       @RequestParam(required = false) String match);
 
   @GetExchange("/loki/api/v1/label/{label}/values")
-  byte[] labelValues(
+  String labelValues(
       @PathVariable("label") String label,
       @RequestParam(required = false) Long start,
       @RequestParam(required = false) Long end,
       @RequestParam(required = false) String match);
 
   @GetExchange("/loki/api/v1/series")
-  byte[] series(
+  String series(
       @RequestParam("match") List<String> matches,
       @RequestParam long start,
       @RequestParam long end);
 
   @GetExchange("/loki/api/v1/query_range")
-  byte[] queryRange(
+  String queryRange(
       @RequestParam String query,
       @RequestParam long start,
       @RequestParam long end,
@@ -46,7 +46,7 @@ public interface LogQueries {
       @RequestParam(required = false) String direction);
 
   @GetExchange("/loki/api/v1/query")
-  byte[] query(
+  String query(
       @RequestParam String query,
       @RequestParam("time") long timeNanos,
       @RequestParam(required = false) Integer limit,

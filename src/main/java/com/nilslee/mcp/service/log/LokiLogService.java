@@ -1,8 +1,6 @@
 package com.nilslee.mcp.service.log;
 
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.databind.node.ObjectNode;
 import com.nilslee.mcp.model.log.LogDirection;
 import com.nilslee.mcp.service.log.query.LogQueries;
 import org.jspecify.annotations.Nullable;
@@ -43,13 +41,10 @@ public class LokiLogService {
       if (namespace != null && !namespace.isBlank()) {
         match = namespaceMatchSelector(namespace);
       }
-      String raw =
-          utf8(
-              logQueries.labels(
-                  optionalNanosOrNull(startNanosInclusive),
-                  optionalNanosOrNull(endNanosInclusive),
-                  match));
-      return renameTopLevelDataStringArray(raw, "labelNames");
+      return logQueries.labels(
+          optionalNanosOrNull(startNanosInclusive),
+          optionalNanosOrNull(endNanosInclusive),
+          match);
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }
@@ -65,14 +60,11 @@ public class LokiLogService {
       if (namespace != null && !namespace.isBlank()) {
         match = namespaceMatchSelector(namespace);
       }
-      String raw =
-          utf8(
-              logQueries.labelValues(
-                  labelName,
-                  optionalNanosOrNull(startNanosInclusive),
-                  optionalNanosOrNull(endNanosInclusive),
-                  match));
-      return renameTopLevelDataStringArray(raw, "values");
+      return logQueries.labelValues(
+          labelName,
+          optionalNanosOrNull(startNanosInclusive),
+          optionalNanosOrNull(endNanosInclusive),
+          match);
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }
@@ -93,7 +85,7 @@ public class LokiLogService {
           }
         }
       }
-      return utf8(logQueries.series(matches, startNanosInclusive, endNanosInclusive));
+      return logQueries.series(matches, startNanosInclusive, endNanosInclusive);
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }
@@ -107,7 +99,7 @@ public class LokiLogService {
       @Nullable LogDirection direction) {
     try {
       String dir = direction != null ? direction.name().toLowerCase() : LogDirection.BACKWARD.name().toLowerCase();
-      return utf8(logQueries.queryRange(query, startNanosInclusive, endNanosInclusive, limit, dir));
+      return logQueries.queryRange(query, startNanosInclusive, endNanosInclusive, limit, dir);
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }
@@ -121,7 +113,7 @@ public class LokiLogService {
       @Nullable Integer delayForSeconds) {
     try {
       String dir = direction != null ? direction.name().toLowerCase() : LogDirection.BACKWARD.name().toLowerCase();
-      return utf8(logQueries.query(query, timeNanos, limit, dir, delayForSeconds));
+      return logQueries.query(query, timeNanos, limit, dir, delayForSeconds);
     } catch (RestClientException ex) {
       return LokiErrorResponses.fromException(ex, jsonMapper);
     }
@@ -143,35 +135,5 @@ public class LokiLogService {
       return null;
     }
     return nanos;
-  }
-
-  private static String utf8(byte[] body) {
-    if (body == null || body.length == 0) {
-      return "";
-    }
-    return new String(body, StandardCharsets.UTF_8);
-  }
-
-  /**
-   * Some MCP clients mishandle tool text that looks like JSON with a top-level {@code data} array
-   * (they keep {@code status} but drop the array). Loki’s label APIs use that shape. We expose the same
-   * strings under a neutral key so the payload survives; native Loki uses {@code data}.
-   */
-  private String renameTopLevelDataStringArray(String raw, String newKey) {
-    try {
-      JsonNode root = jsonMapper.readTree(raw);
-      if (!(root instanceof ObjectNode object)) {
-        return raw;
-      }
-      JsonNode data = object.get("data");
-      if (data == null || !data.isArray()) {
-        return raw;
-      }
-      object.set(newKey, data);
-      object.remove("data");
-      return jsonMapper.writeValueAsString(object);
-    } catch (Exception e) {
-      return raw;
-    }
   }
 }

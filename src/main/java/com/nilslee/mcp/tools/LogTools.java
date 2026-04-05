@@ -43,8 +43,7 @@ public class LogTools {
               + "List log label names. Use when queries return empty or to discover dimensions. "
               + "Optional start/end are Unix nanoseconds to scope active streams; omit both (or use null) "
               + "so Loki uses its default time window. Do not use 0 for start/end—that narrows to the epoch and returns no labels. "
-              + "Optional namespace scopes discovery via Loki match={namespace=\"…\"}. "
-              + "Response uses key labelNames (string array) instead of Loki’s data, for MCP compatibility.")
+              + "Optional namespace scopes discovery via Loki match={namespace=\"…\"}.")
   public String listLokiLabels(
       @Nullable Long startNanosInclusive,
       @Nullable Long endNanosInclusive,
@@ -69,8 +68,7 @@ public class LogTools {
               + "List values for one label (e.g. job, namespace, pod). "
               + "Optional start/end in Unix nanoseconds narrow the window; omit or null for Loki defaults. "
               + "Do not use 0 for start/end (epoch window, usually empty). "
-              + "Optional namespace scopes discovery via Loki match={namespace=\"…\"}. "
-              + "Response uses key values (string array) instead of Loki’s data, for MCP compatibility.")
+              + "Optional namespace scopes discovery via Loki match={namespace=\"…\"}.")
   public String listLokiLabelValues(
       String labelName,
       @Nullable Long startNanosInclusive,
