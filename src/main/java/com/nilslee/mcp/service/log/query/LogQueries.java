@@ -10,31 +10,35 @@ import java.util.List;
 /**
  * Declarative Loki read API ({@code /loki/api/v1/*}). Base URL and auth are configured on the
  * backing {@link org.springframework.web.client.RestClient} bean.
+ *
+ * <p>Responses use {@code byte[]} so the HTTP client reads the raw body. Declaring {@link String}
+ * with {@code Content-Type: application/json} can route through Jackson and drop or reshape fields
+ * (for example Loki’s {@code data} array on label endpoints).
  */
 @HttpExchange
 public interface LogQueries {
 
   @GetExchange("/loki/api/v1/labels")
-  String labels(
+  byte[] labels(
       @RequestParam(required = false) Long start,
       @RequestParam(required = false) Long end,
       @RequestParam(required = false) String match);
 
   @GetExchange("/loki/api/v1/label/{label}/values")
-  String labelValues(
+  byte[] labelValues(
       @PathVariable("label") String label,
       @RequestParam(required = false) Long start,
       @RequestParam(required = false) Long end,
       @RequestParam(required = false) String match);
 
   @GetExchange("/loki/api/v1/series")
-  String series(
+  byte[] series(
       @RequestParam("match") List<String> matches,
       @RequestParam long start,
       @RequestParam long end);
 
   @GetExchange("/loki/api/v1/query_range")
-  String queryRange(
+  byte[] queryRange(
       @RequestParam String query,
       @RequestParam long start,
       @RequestParam long end,
@@ -42,7 +46,7 @@ public interface LogQueries {
       @RequestParam(required = false) String direction);
 
   @GetExchange("/loki/api/v1/query")
-  String query(
+  byte[] query(
       @RequestParam String query,
       @RequestParam("time") long timeNanos,
       @RequestParam(required = false) Integer limit,
