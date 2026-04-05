@@ -1,4 +1,11 @@
 package com.nilslee.mcp.exception;
 
-public class LogInputException {
+/**
+ * Thrown when a model-supplied input fails validation before any Log API call is made.
+ */
+public class LogInputException extends RuntimeException {
+
+  public LogInputException(String message) {
+    super(message);
+  }
 }

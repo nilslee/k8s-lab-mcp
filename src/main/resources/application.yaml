@@ -2,6 +2,18 @@ spring:
   application:
     name: mcp
 
+  http:
+    serviceclient:
+      loki:
+        base-url: http://loki.k8s.lab
+        connect-timeout: 10s
+        read-timeout: 30s
+#      prometheus:
+#      argoCD:
+#      jenkins:
+
+
+
   # MCP Server Configuration
   ai:
     mcp:
@@ -23,11 +35,17 @@ management:
 
 mcp:
   kubernetes:
-    # Optional allowlist. Empty = allow all namespaces the kubeconfig can read.
-    # Example: allowed-namespaces: [default, kube-system, monitoring]
-    allowed-namespaces: []
     # Maximum number of events returned by get-events tool.
     max-events: 500
     # Timeouts for Kubernetes API server communication.
     connection-timeout: 10s
     read-timeout: 30s
+  monitoring:
+    loki:
+      # Optional Grafana basic auth for the Loki client (see spring.http.serviceclient.loki for URL/timeouts).
+      username: ${GRAFANA_USERNAME:}
+      password: ${GRAFANA_PASSWORD:}
+#  git-ops:
+#    argoCD:
+#    jenkins:
+
