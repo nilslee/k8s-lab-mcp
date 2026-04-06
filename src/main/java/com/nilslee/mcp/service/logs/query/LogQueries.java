@@ -1,4 +1,4 @@
-package com.nilslee.mcp.service.log.query;
+package com.nilslee.mcp.service.logs.query;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

@@ -1,4 +1,4 @@
-package com.nilslee.mcp.config.log;
+package com.nilslee.mcp.config.logs;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;

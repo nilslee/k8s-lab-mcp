@@ -1,7 +1,7 @@
 package com.nilslee.mcp.tools;
 
-import com.nilslee.mcp.model.log.LogDirection;
-import com.nilslee.mcp.service.log.LokiLogService;
+import com.nilslee.mcp.model.logs.LogDirection;
+import com.nilslee.mcp.service.logs.LokiLogService;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

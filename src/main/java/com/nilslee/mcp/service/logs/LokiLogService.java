@@ -1,8 +1,8 @@
-package com.nilslee.mcp.service.log;
+package com.nilslee.mcp.service.logs;
 
 import tools.jackson.databind.json.JsonMapper;
-import com.nilslee.mcp.model.log.LogDirection;
-import com.nilslee.mcp.service.log.query.LogQueries;
+import com.nilslee.mcp.model.logs.LogDirection;
+import com.nilslee.mcp.service.logs.query.LogQueries;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;

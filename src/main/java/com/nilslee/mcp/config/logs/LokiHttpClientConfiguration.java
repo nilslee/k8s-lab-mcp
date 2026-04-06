@@ -1,11 +1,9 @@
-package com.nilslee.mcp.config.log;
+package com.nilslee.mcp.config.logs;
 
-import com.nilslee.mcp.service.log.query.LogQueries;
-import org.jspecify.annotations.Nullable;
+import com.nilslee.mcp.service.logs.query.LogQueries;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer;
 import org.springframework.web.service.registry.ImportHttpServices;
 

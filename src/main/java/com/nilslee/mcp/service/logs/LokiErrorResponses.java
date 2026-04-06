@@ -1,4 +1,4 @@
-package com.nilslee.mcp.service.log;
+package com.nilslee.mcp.service.logs;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
