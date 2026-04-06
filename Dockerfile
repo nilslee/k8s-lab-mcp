@@ -25,18 +25,13 @@ RUN apt-get update \
   && KUBECTL_VERSION="$(curl -fsSL https://dl.k8s.io/release/stable.txt | tr -d '\n')" \
   && ARCH="$(dpkg --print-architecture)" \
   && curl -fsSL -o /usr/local/bin/kubectl \
-       "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
+  "https://dl.k8s.io/release/${KUBECTL_VERSION}/bin/linux/${ARCH}/kubectl" \
   && chmod +x /usr/local/bin/kubectl \
   && rm -rf /var/lib/apt/lists/*
 
 RUN groupadd -r mcp && useradd -r -g mcp mcp
 
 COPY --from=build /build/target/mcp-*.jar app.jar
-
-# Shell scripts used by MCP tools (entire tree, including subdirs e.g. scripts/cluster-resources/)
-COPY scripts ./scripts
-RUN find scripts -type f -name "*.sh" -exec chmod +x {} + \
-  && chown -R mcp:mcp scripts
 
 # Kubeconfig is bind-mounted at /app/kubeconfig at runtime (read-only)
 ENV KUBECONFIG=/app/kubeconfig
