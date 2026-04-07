@@ -7,7 +7,7 @@ import org.springframework.web.service.annotation.HttpExchange;
 
 import java.util.List;
 
-@HttpExchange
+@HttpExchange("/api/v1")
 public interface PrometheusMetricQueries {
 
   @GetExchange("/query")
