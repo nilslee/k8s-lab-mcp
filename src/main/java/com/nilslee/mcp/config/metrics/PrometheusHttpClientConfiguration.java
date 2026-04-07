@@ -13,7 +13,7 @@ import org.springframework.web.service.registry.ImportHttpServices;
 public class PrometheusHttpClientConfiguration {
 
   @Bean
-  RestClientHttpServiceGroupConfigurer lokiGrafanaBasicAuthConfigurer(PrometheusConfigurationProperties props) {
+  RestClientHttpServiceGroupConfigurer prometheusBasicAuthConfigurer(PrometheusConfigurationProperties props) {
     return (groups -> groups
         .filterByName("prometheus")
         .forEachClient((group, client) -> {
