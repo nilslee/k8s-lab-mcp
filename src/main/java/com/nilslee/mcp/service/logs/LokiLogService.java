@@ -2,7 +2,7 @@ package com.nilslee.mcp.service.logs;
 
 import tools.jackson.databind.json.JsonMapper;
 import com.nilslee.mcp.model.logs.LogDirection;
-import com.nilslee.mcp.service.logs.query.LogQueries;
+import com.nilslee.mcp.service.logs.query.LokiLogQueries;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -21,10 +21,10 @@ public class LokiLogService {
   /** Lookback window for {@link #tailLogs}: Loki log queries require {@code query_range}, not instant query. */
   private static final long TAIL_LOOKBACK_NANOS = 3600L * 1_000_000_000L;
 
-  private final LogQueries logQueries;
+  private final LokiLogQueries logQueries;
   private final JsonMapper jsonMapper;
 
-  public LokiLogService(LogQueries logQueries, JsonMapper jsonMapper) {
+  public LokiLogService(LokiLogQueries logQueries, JsonMapper jsonMapper) {
     this.logQueries = logQueries;
     this.jsonMapper = jsonMapper;
   }
@@ -34,7 +34,7 @@ public class LokiLogService {
    *
    * @param namespace optional; when set, sent as Loki {@code match={namespace="…"}} to scope discovery
    */
-  public String listLokiLabels(
+  public String listLabels(
       @Nullable Long startNanosInclusive,
       @Nullable Long endNanosInclusive,
       @Nullable String namespace) {
@@ -52,7 +52,7 @@ public class LokiLogService {
     }
   }
 
-  public String listLokiLabelValues(
+  public String listLabelValues(
       String labelName,
       @Nullable Long startNanosInclusive,
       @Nullable Long endNanosInclusive,
@@ -72,7 +72,7 @@ public class LokiLogService {
     }
   }
 
-  public String listLokiSeries(
+  public String listSeries(
       String streamSelector,
       long startNanosInclusive,
       long endNanosInclusive,

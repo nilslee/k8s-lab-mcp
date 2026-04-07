@@ -16,7 +16,7 @@ import java.util.List;
  * (for example Loki’s {@code data} array on label endpoints).
  */
 @HttpExchange
-public interface LogQueries {
+public interface LokiLogQueries {
 
   @GetExchange("/loki/api/v1/labels")
   String labels(

@@ -29,7 +29,7 @@ public class LogTools {
   }
 
   /**
-   * Exposes {@link LokiLogService#listLokiLabels(Long, Long, String)} to MCP clients.
+   * Exposes {@link LokiLogService#listLabels(Long, Long, String)} to MCP clients.
    *
    * @param startNanosInclusive optional range start (inclusive), nanoseconds
    * @param endNanosInclusive   optional range end (inclusive), nanoseconds
@@ -49,11 +49,11 @@ public class LogTools {
       @Nullable Long endNanosInclusive,
       @Nullable String namespace) {
     log.debug("list-loki-labels start={} end={} namespace={}", startNanosInclusive, endNanosInclusive, namespace);
-    return lokiLogService.listLokiLabels(startNanosInclusive, endNanosInclusive, namespace);
+    return lokiLogService.listLabels(startNanosInclusive, endNanosInclusive, namespace);
   }
 
   /**
-   * Exposes {@link LokiLogService#listLokiLabelValues(String, Long, Long, String)} to MCP clients.
+   * Exposes {@link LokiLogService#listLabelValues(String, Long, Long, String)} to MCP clients.
    *
    * @param labelName           Loki label name (path segment, e.g. {@code namespace}, {@code pod})
    * @param startNanosInclusive optional range start (inclusive), nanoseconds
@@ -80,11 +80,11 @@ public class LogTools {
         startNanosInclusive,
         endNanosInclusive,
         namespace);
-    return lokiLogService.listLokiLabelValues(labelName, startNanosInclusive, endNanosInclusive, namespace);
+    return lokiLogService.listLabelValues(labelName, startNanosInclusive, endNanosInclusive, namespace);
   }
 
   /**
-   * Exposes {@link LokiLogService#listLokiSeries(String, long, long, java.util.List)} to MCP clients.
+   * Exposes {@link LokiLogService#listSeries(String, long, long, java.util.List)} to MCP clients.
    *
    * @param streamSelector            primary LogQL stream selector (first {@code match[]} parameter)
    * @param startNanosInclusive       range start (inclusive), nanoseconds
@@ -110,7 +110,7 @@ public class LogTools {
         startNanosInclusive,
         endNanosInclusive,
         additionalStreamSelectors);
-    return lokiLogService.listLokiSeries(
+    return lokiLogService.listSeries(
         streamSelector, startNanosInclusive, endNanosInclusive, additionalStreamSelectors);
   }
 
