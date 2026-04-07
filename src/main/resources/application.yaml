@@ -8,7 +8,10 @@ spring:
         base-url: http://loki.k8s.lab
         connect-timeout: 10s
         read-timeout: 30s
-#      prometheus:
+      prometheus:
+        base-url: http://loki.k8s.lab
+        connect-timeout: 10s
+        read-timeout: 30s
 #      argoCD:
 #      jenkins:
 
