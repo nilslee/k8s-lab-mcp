@@ -9,7 +9,7 @@ spring:
         connect-timeout: 10s
         read-timeout: 30s
       prometheus:
-        base-url: http://loki.k8s.lab
+        base-url: http://prometheus.k8s.lab
         connect-timeout: 10s
         read-timeout: 30s
 #      argoCD:
