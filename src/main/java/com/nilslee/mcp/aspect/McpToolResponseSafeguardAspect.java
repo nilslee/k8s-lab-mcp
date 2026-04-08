@@ -1,4 +1,4 @@
-package com.nilslee.mcp.config.response;
+package com.nilslee.mcp.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

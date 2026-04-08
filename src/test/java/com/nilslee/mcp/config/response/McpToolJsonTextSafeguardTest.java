@@ -2,6 +2,7 @@ package com.nilslee.mcp.config.response;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.nilslee.mcp.aspect.McpToolJsonTextSafeguard;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.json.JsonMapper;
 

@@ -1,6 +1,6 @@
 # k8s-lab MCP Server
 
-A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for the k8s-lab project. It exposes **read-only Kubernetes cluster visibility** and **Grafana Loki log access** to coding agents (for example Cursor) over **HTTP** using the Streamable transport, so assistants can inspect workloads and logs without shell access.
+A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for the k8s-lab project. It exposes **read-only Kubernetes cluster visibility**, **Grafana Loki log access**, and **Prometheus metrics API (v1)** to coding agents (for example Cursor) over **HTTP** using the Streamable transport, so assistants can inspect workloads, logs, and metrics without shell access.
 
 ## Stack and transport
 
@@ -9,7 +9,8 @@ A [Model Context Protocol (MCP)](https://modelcontextprotocol.io/) server for th
 | Framework    | Spring Boot (see `pom.xml`)                                                                                                                         |
 | MCP          | `spring-ai-starter-mcp-server-webmvc` (Spring AI `2.0.0-M3`)                                                                                        |
 | Kubernetes   | Fabric8 `kubernetes-client` — all cluster tools use the **Kubernetes API** via Java (list/get only; no create/update/delete, exec, or port-forward) |
-| Logs         | Spring `RestClient` to Loki’s HTTP API (`/loki/api/v1/*`)                                                                                           |
+| Logs         | Spring declarative HTTP client (`@HttpExchange`) to Loki (`/loki/api/v1/*`), configured under `spring.http.serviceclient.loki`                    |
+| Metrics      | Same pattern for Prometheus (`/api/v1/*` on the interface), configured under `spring.http.serviceclient.prometheus`                               |
 | Default port | `9000` (`server.port` in `src/main/resources/application.yaml`)                                                                                     |
 
 MCP server metadata in `application.yaml`: `spring.ai.mcp.server` — `protocol: streamable`, `stdio: false`, `type: sync`, `version: 0.1.1`.
@@ -18,9 +19,18 @@ Spring Boot Actuator exposes `health` and `info` under the management web base p
 
 ## Configuration
 
-**Loki HTTP client** (`spring.http.serviceclient.loki`):
+### HTTP service clients (`spring.http.serviceclient`)
+
+Spring Boot binds **`base-url`**, **`connect-timeout`**, and **`read-timeout`** per **client name**. The name must match the **`group`** in `@ImportHttpServices(group = "…", …)` on the corresponding `@Configuration` class (`loki` → `LokiLogQueries`, `prometheus` → `PrometheusMetricQueries`).
+
+**Loki** (`spring.http.serviceclient.loki`):
 
 - `base-url` — default `http://loki.k8s.lab`
+- `connect-timeout`, `read-timeout` — defaults `10s` / `30s`
+
+**Prometheus** (`spring.http.serviceclient.prometheus`):
+
+- `base-url` — default `http://prometheus.k8s.lab` (origin only; API prefix `/api/v1` lives on `PrometheusMetricQueries`, not in `base-url`)
 - `connect-timeout`, `read-timeout` — defaults `10s` / `30s`
 
 **Optional Grafana basic auth** for Loki (`mcp.monitoring.loki`):
@@ -36,7 +46,7 @@ Spring Boot Actuator exposes `health` and `info` under the management web base p
 - `max-events` — cap for `get-events` (default `500`)
 - `connection-timeout`, `read-timeout` — API server timeouts (defaults `10s` / `30s`)
 
-**Loki JSON responses and MCP clients** (`mcp.tool-response`):
+**Loki / Prometheus JSON and MCP clients** (`mcp.tool-response`):
 
 - `serialize-top-level-data-json-array` (default `true`) — when tool output is JSON with a top-level `data` array, it can be rewritten to a JSON string so some MCP clients preserve the payload. Set to `false` if you need raw Loki-style arrays.
 
@@ -67,18 +77,34 @@ Timestamps are **Unix epoch nanoseconds** unless noted. Loki responses are retur
 | Tool                     | Description                                                                                                                                                                                                    |
 | ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `list-loki-labels`       | Label names; optional `startNanosInclusive`, `endNanosInclusive`, `namespace` (scopes via `match={namespace="…"}`). Do not use `0` for start/end (epoch window is usually empty)                               |
-| `list-loki-label-values` | Values for one `labelName`; optional start/end nanoseconds, optional `namespace` scope                                                                                                                         |
+| `list-loki-label-values` | Values for one `labelName`; optional start/end nanoseconds, optional `namespace` scope                                                                                                                      |
 | `list-loki-series`       | Stream label-sets; required `streamSelector`, `startNanosInclusive`, `endNanosInclusive`; optional `additionalStreamSelectors` (extra `match[]`, intersection)                                                 |
 | `query-logs`             | Time-range logs via `query_range`: `query`, `startNanosInclusive`, `endNanosInclusive`; optional `limit`, `direction` (`FORWARD` / `BACKWARD`)                                                                 |
 | `tail-logs`              | Newest lines near one instant: `query`, `startNanosInclusive` (**as-of end** of window); 1h lookback, backward `query_range`. Optional `limit`, `delayForSeconds` (ingest lag). **Not** live WebSocket tailing |
 
-Implementation lives in `LogTools` → `LokiLogService`.
+Implementation lives in `LogTools` → `LokiLogService` → `LokiLogQueries`.
+
+### Metrics (Prometheus HTTP API v1)
+
+Responses are **Prometheus JSON** (`status`, `data`, etc.) as text. Query times use **RFC3339 or Unix seconds** as in the Prometheus API. Intended for **kube-prometheus-stack** or any server exposing the standard **`/api/v1/*`** routes.
+
+| Area | Tools |
+| ---- | ----- |
+| **Query** | `prometheus-query` (instant), `prometheus-query-range` (needs `query`, `start`, `end`, `step`), `prometheus-query-exemplars`, `prometheus-parse-query`, `prometheus-format-query` |
+| **TSDB / metadata** | `list-prometheus-labels`, `list-prometheus-label-values`, `list-prometheus-series`, `prometheus-metadata` |
+| **Targets & rules** | `prometheus-targets`, `prometheus-targets-metadata`, `prometheus-scrape-pools`, `prometheus-alerts`, `prometheus-rules`, `prometheus-alertmanagers`, `prometheus-notifications` |
+| **Server status** | `prometheus-status-buildinfo`, `prometheus-status-config`, `prometheus-status-flags`, `prometheus-status-runtimeinfo`, `prometheus-status-tsdb`, `prometheus-status-tsdb-blocks`, `prometheus-status-walreplay` |
+| **Other** | `prometheus-features` |
+
+**Note:** If you call `prometheus-rules` with a `group_limit` query parameter, Prometheus requires it to be **greater than zero**; `0` returns `400 bad_data`.
+
+Implementation lives in `MetricTools` → `PrometheusMetricService` → `PrometheusMetricQueries` (`@HttpExchange("/api/v1")`), wired by `PrometheusHttpClientConfiguration` and `spring.http.serviceclient.prometheus`.
 
 ## Run in cluster
 
 **Cluster setup:** Provision the K8s-Lab platform (multi-node K3s, monitoring, GitOps, and related wiring) from **[nilslee/cluster-infra](https://github.com/nilslee/cluster-infra/)**. That repository is the source of truth for VMs, k3s, Argo CD, Jenkins, and the observability stack; deploy it before running this MCP server against the lab.
 
-**Runtime expectations:** The server is intended to run **alongside** the cluster (for example on a Jenkins/build host or another VM that can reach both the Kubernetes API and Loki), not necessarily as a Pod inside the cluster—though you could deploy it in-cluster if you mount credentials and point `spring.http.serviceclient.loki.base-url` at a resolvable in-cluster Loki/Grafana URL.
+**Runtime expectations:** The server is intended to run **alongside** the cluster (for example on a Jenkins/build host or another VM that can reach the Kubernetes API, Loki, and Prometheus), not necessarily as a Pod inside the cluster—though you could deploy it in-cluster if you mount credentials and point `spring.http.serviceclient.loki.base-url` and `spring.http.serviceclient.prometheus.base-url` at resolvable URLs (in-cluster services or lab DNS such as `loki.k8s.lab` / `prometheus.k8s.lab`).
 
 1. **Build the image** from this directory (see `Dockerfile`):
 
@@ -102,7 +128,7 @@ Implementation lives in `LogTools` → `LokiLogService`.
      mcp-server:latest
    ```
 
-   Use `--network=host` (or another network mode) so hostnames such as `loki.k8s.lab` from `application.yaml` resolve the same way as on your lab machines. Omit or adjust Grafana env vars if Loki is open on your network.
+   Use `--network=host` (or another network mode) so hostnames such as `loki.k8s.lab` and `prometheus.k8s.lab` from `application.yaml` resolve the same way as on your lab machines. Omit or adjust Grafana env vars if Loki is open on your network.
 
 3. **Verify:** Actuator health and MCP HTTP endpoint (typical paths):
 
@@ -119,9 +145,8 @@ These match empty tool classes and commented configuration in `application.yaml`
 
 | Area                       | Intent                                                                              | Code / config hints                                                                                           |
 | -------------------------- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Metrics (Prometheus)**   | Raw PromQL and/or canned queries (for example pod/node/cluster resource views)      | `MetricTools.java` (stub); commented `spring.http.serviceclient.prometheus`                                   |
 | **GitOps**                 | Argo CD application status, sync, diffs; possible Jenkins integration               | `GitOpsTools.java` (stub); commented `argoCD` / `jenkins` under `spring.http.serviceclient` and `mcp.git-ops` |
-| **Compound / convenience** | Single-call workflows (for example pod diagnosis combining events, logs, metrics)   | `CompoundTools.java` (stub) — examples from earlier design: `diagnose-pod`, `namespace-overview`              |
+| **Compound / convenience** | Single-call workflows (for example pod diagnosis combining events, logs, metrics)   | `CompoundTools.java` (stub) — examples from earlier design: `diagnose-pod`, `namespace-overview`          |
 | **Other transports**       | Today `stdio: false`; stdio or additional MCP deployment modes could be added later | `spring.ai.mcp.server`                                                                                        |
 
 When implemented, this section should shrink and the tools should move into **Current tools** with accurate parameters and backing APIs.
