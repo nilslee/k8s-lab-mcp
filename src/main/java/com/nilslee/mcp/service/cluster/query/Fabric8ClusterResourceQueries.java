@@ -1,12 +1,6 @@
 package com.nilslee.mcp.service.cluster.query;
 
-import io.fabric8.kubernetes.api.model.Event;
-import io.fabric8.kubernetes.api.model.ListOptions;
-import io.fabric8.kubernetes.api.model.ListOptionsBuilder;
-import io.fabric8.kubernetes.api.model.Namespace;
-import io.fabric8.kubernetes.api.model.Node;
-import io.fabric8.kubernetes.api.model.Pod;
-import io.fabric8.kubernetes.api.model.Service;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.api.model.apps.Deployment;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.NodeMetricsList;
 import io.fabric8.kubernetes.api.model.metrics.v1beta1.PodMetricsList;
@@ -19,9 +13,9 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Fabric8-based implementation. This is the ONLY class that calls KubernetesClient.
- * All operations are strictly read-only (list/get). No create/update/delete/patch,
- * no pod exec, no port-forward, no arbitrary API paths.
+ * Fabric8-based implementation. This is the only class that calls {@link KubernetesClient}.
+ * Most operations are list/get reads. {@link #setSecret} performs create-or-replace for
+ * MCP-managed secrets (for example Argo CD bootstrap credentials written at runtime).
  */
 @Component
 public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
@@ -114,6 +108,26 @@ public class Fabric8ClusterResourceQueries implements ClusterResourceQueries {
         return isBlank(namespace)
                 ? client.top().pods().metrics()
                 : client.top().pods().inNamespace(namespace).metrics();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public SecretList listSecrets(@Nullable String namespace) {
+        return isBlank(namespace)
+            ? client.secrets().inAnyNamespace().list()
+            : client.secrets().inNamespace(namespace).list();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Secret getSecret(String namespace, String secretName) {
+        return client.secrets().inNamespace(namespace).withName(secretName).get();
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Secret setSecret(String namespace, Secret secret) {
+        return client.secrets().inNamespace(namespace).resource(secret).createOrReplace();
     }
 
     private boolean isBlank(@Nullable String value) {

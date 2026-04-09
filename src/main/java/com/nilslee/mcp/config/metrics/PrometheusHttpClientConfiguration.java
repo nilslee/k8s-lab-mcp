@@ -16,7 +16,7 @@ public class PrometheusHttpClientConfiguration {
   RestClientHttpServiceGroupConfigurer prometheusBasicAuthConfigurer(PrometheusConfigurationProperties props) {
     return (groups -> groups
         .filterByName("prometheus")
-        .forEachClient((group, client) -> {
+        .forEachClient((group, clientBuilder) -> {
           // Empty for now
         }));
   }

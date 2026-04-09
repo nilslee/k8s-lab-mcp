@@ -3,6 +3,7 @@ package com.nilslee.mcp.config;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.nilslee.mcp.aspect.McpToolResponseSafeguardAspect;
+import com.nilslee.mcp.tools.GitOpsTools;
 import com.nilslee.mcp.tools.LogTools;
 import org.junit.jupiter.api.Test;
 import org.springframework.aop.support.AopUtils;
@@ -18,8 +19,11 @@ class McpToolResponseSafeguardAspectIT {
 
   @Autowired LogTools logTools;
 
+  @Autowired GitOpsTools gitOpsTools;
+
   @Test
   void toolBeansAreSpringProxies() {
     assertThat(AopUtils.isAopProxy(logTools)).isTrue();
+    assertThat(AopUtils.isAopProxy(gitOpsTools)).isTrue();
   }
 }

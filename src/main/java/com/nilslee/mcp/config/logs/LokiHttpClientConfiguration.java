@@ -24,11 +24,11 @@ public class LokiHttpClientConfiguration {
     return groups -> groups
         .filterByName("loki")
         .forEachClient(
-            (group, builder) -> {
+            (group, clientBuilder) -> {
               String user = props.username();
               if (user != null && !user.isBlank()) {
                 String pass = props.password() != null ? props.password() : "";
-                builder.defaultHeaders(h -> h.setBasicAuth(user, pass));
+                clientBuilder.defaultHeaders(h -> h.setBasicAuth(user, pass));
               }
             });
   }

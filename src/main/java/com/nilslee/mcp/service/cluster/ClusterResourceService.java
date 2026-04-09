@@ -2,7 +2,11 @@ package com.nilslee.mcp.service.cluster;
 
 import com.nilslee.mcp.model.cluster.InvolvedObjectKind;
 import com.nilslee.mcp.model.cluster.PodPhaseFilter;
+import io.fabric8.kubernetes.api.model.Secret;
+import io.fabric8.kubernetes.api.model.SecretList;
 import org.jspecify.annotations.Nullable;
+
+import java.util.Map;
 
 /**
  * Façade used by MCP tools. Orchestrates validation → query → format.
@@ -85,4 +89,35 @@ public interface ClusterResourceService {
      * @return formatted text for the model, or an error hint if metrics are unavailable
      */
     String topPods(@Nullable String namespace);
+
+    /**
+     * Lists secrets in one namespace or cluster-wide when {@code namespace} is blank.
+     *
+     * @param namespace {@code null} or blank = all namespaces
+     */
+    SecretList listSecrets(@Nullable String namespace);
+
+    /**
+     * Reads one key from a Kubernetes {@code Secret}'s {@code data} or {@code stringData}.
+     * {@code data} values are base64 on the wire; this returns decoded UTF-8 plaintext when applicable.
+     *
+     * @param namespace  secret namespace (required)
+     * @param secretName secret metadata name (required)
+     * @param keyName    key within the secret (required)
+     * @return decoded value, or {@code null} if the secret or key is missing
+     */
+    @Nullable
+    String getSecretValue(String namespace, String secretName, String keyName);
+
+    /**
+     * Creates or replaces a secret using {@code stringData} (plaintext map; encoded by the client).
+     * Intended for MCP-managed credentials; do not expose arbitrary writes via tools without review.
+     *
+     * @param namespace  target namespace
+     * @param secretName metadata name of the secret
+     * @param secretMap  plaintext entries (e.g. {@code password -> value})
+     * @return persisted secret from the API
+     */
+    Secret setSecret(String namespace, String secretName, Map<String, String> secretMap);
+
 }

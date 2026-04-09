@@ -6,21 +6,25 @@ import com.nilslee.mcp.service.cluster.format.ClusterResourceTextFormatter;
 import com.nilslee.mcp.service.cluster.query.ClusterResourceQueries;
 import com.nilslee.mcp.service.cluster.validation.ClusterResourceInputValidator;
 import com.nilslee.mcp.config.cluster.McpKubernetesProperties;
-import io.fabric8.kubernetes.api.model.Event;
-import io.fabric8.kubernetes.api.model.Pod;
+import io.fabric8.kubernetes.api.model.*;
 import io.fabric8.kubernetes.client.KubernetesClientException;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Default implementation of {@link ClusterResourceService}.
- * Coordinates validation → Kubernetes API query → text formatting.
- * Validation failures never reach the query layer.
+ * Coordinates validation → Kubernetes API query → text formatting for MCP tools.
+ * Secret helpers ({@link #getSecretValue}, {@link #setSecret}) decode {@code data} entries and write via
+ * {@code stringData}; validation failures never reach the query layer.
  */
 @Service
 public class DefaultClusterResourceService implements ClusterResourceService {
@@ -135,4 +139,63 @@ public class DefaultClusterResourceService implements ClusterResourceService {
             return "Pod metrics unavailable: metrics-server may not be installed or reachable. Error: " + e.getMessage();
         }
     }
+
+
+    /** {@inheritDoc} */
+    @Override
+    public SecretList listSecrets(@Nullable String namespace) {
+        validator.validateNamespace(namespace);
+        return queries.listSecrets(namespace);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    @Nullable
+    public String getSecretValue(String namespace, String secretName, String keyName) {
+        validator.validateRequiredNamespace(namespace);
+        validator.validateRequiredResourceName(secretName, "secretName");
+        validator.validateRequiredResourceName(keyName, "keyName");
+        Secret secret = queries.getSecret(namespace, secretName);
+        if (secret == null) {
+            return null;
+        }
+        if (secret.getStringData() != null) {
+            String plain = secret.getStringData().get(keyName);
+            if (plain != null) {
+                return plain;
+            }
+        }
+        if (secret.getData() == null) {
+            return null;
+        }
+        String encoded = secret.getData().get(keyName);
+        if (encoded == null) {
+            return null;
+        }
+        return decodeSecretDataEntry(encoded);
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public Secret setSecret(String namespace, String secretName, Map<String, String> secretMap) {
+        validator.validateRequiredNamespace(namespace);
+        validator.validateRequiredResourceName(secretName, "secretName");
+        Secret secret =
+                new SecretBuilder()
+                        .withNewMetadata()
+                        .withName(secretName)
+                        .endMetadata()
+                        .withStringData(new LinkedHashMap<>(secretMap))
+                        .build();
+        return queries.setSecret(namespace, secret);
+    }
+
+    private static String decodeSecretDataEntry(String dataValue) {
+        try {
+            return new String(Base64.getDecoder().decode(dataValue), StandardCharsets.UTF_8);
+        } catch (IllegalArgumentException ex) {
+            return dataValue;
+        }
+    }
+
 }

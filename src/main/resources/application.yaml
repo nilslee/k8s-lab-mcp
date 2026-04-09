@@ -12,7 +12,14 @@ spring:
         base-url: http://prometheus.k8s.lab
         connect-timeout: 10s
         read-timeout: 30s
-#      argoCD:
+      argocd-auth:
+        base-url: http://argocd.k8s.lab
+        connect-timeout: 10s
+        read-timeout: 30s
+      argocd-data:
+        base-url: http://argocd.k8s.lab
+        connect-timeout: 10s
+        read-timeout: 30s
 #      jenkins:
 
 
@@ -52,7 +59,13 @@ mcp:
       # Optional Grafana basic auth for the Loki client (see spring.http.serviceclient.loki for URL/timeouts).
       username: ${GRAFANA_USERNAME:}
       password: ${GRAFANA_PASSWORD:}
-#  git-ops:
-#    argoCD:
+#    prometheus:
+  gitops:
+    argocd:
+      namespace: argocd
+      service-account-name: mcp-service-account  # Service account created from argocd values
+      initial-secret-name: argocd-initial-admin-secret  # Secret that contains initial admin password
+      service-account-secret-name: mcp-service-account  # Secret name that contains new password for mcp service account. Created at runtime
+
 #    jenkins:
 
