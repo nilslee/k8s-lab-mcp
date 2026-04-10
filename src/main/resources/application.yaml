@@ -62,8 +62,9 @@ mcp:
 #    prometheus:
   gitops:
     argocd:
-      # 401 "no session information" on GitOps tools: ensure Secret mcp-service-account (key password) matches Argo CD;
-      # first-time bootstrap also needs Secret argocd-initial-admin-secret (see ArgoCDServiceAccountPasswordResolver).
+      # 401 "no session information": Secret mcp-service-account (key password) must match Argo CD. Bootstrap uses
+      # Secret argocd-initial-admin-secret for an admin session, then PUT /account/password (see ArgoCDServiceAccountPasswordResolver).
+      # bootstrap-admin-username: admin   # optional; default admin
       namespace: argocd
       service-account-name: mcp-service-account  # Service account created from argocd values
       initial-secret-name: argocd-initial-admin-secret  # Secret that contains initial admin password

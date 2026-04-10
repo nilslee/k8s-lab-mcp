@@ -1,6 +1,7 @@
 package com.nilslee.mcp.service.gitops.auth;
 
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.service.annotation.HttpExchange;
 import org.springframework.web.service.annotation.PostExchange;
 import org.springframework.web.service.annotation.PutExchange;
@@ -9,8 +10,13 @@ import org.springframework.web.service.annotation.PutExchange;
 @HttpExchange("/api/v1")
 public interface ArgoCDAuthQueries {
 
+  /**
+   * Requires an admin {@code Authorization: Bearer} session token. Argo CD verifies {@code currentPassword}
+   * against the authenticated user (admin), not the account named in the body.
+   */
   @PutExchange("/account/password")
-  void updatePassword(@RequestBody ArgoCdUpdatePasswordRequest body);
+  void updatePassword(
+      @RequestHeader("Authorization") String authorization, @RequestBody ArgoCdUpdatePasswordRequest body);
 
   @PostExchange("/session")
   ArgoCdSessionResponse createSessionToken(@RequestBody ArgoCdSessionRequest body);
