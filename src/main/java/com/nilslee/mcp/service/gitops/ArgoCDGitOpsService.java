@@ -1,10 +1,13 @@
 package com.nilslee.mcp.service.gitops;
 
+import com.nilslee.mcp.service.gitops.auth.ArgoCDSessionCache;
 import com.nilslee.mcp.service.gitops.query.ArgoCDQueries;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 /**
  * Application service for Argo CD read operations used by {@link com.nilslee.mcp.tools.GitOpsTools}.
@@ -14,9 +17,27 @@ import java.util.List;
 public class ArgoCDGitOpsService {
 
   private final ArgoCDQueries argoCDQueries;
+  private final ArgoCDSessionCache sessionCache;
 
-  public ArgoCDGitOpsService(ArgoCDQueries argoCDQueries) {
+  public ArgoCDGitOpsService(ArgoCDQueries argoCDQueries, ArgoCDSessionCache sessionCache) {
     this.argoCDQueries = argoCDQueries;
+    this.sessionCache = sessionCache;
+  }
+
+  /**
+   * Clears the cached Argo CD session and retries once on HTTP 401 so a fresh {@code POST /session} runs on the next
+   * outbound request (handles server restarts and expired JWTs).
+   */
+  private String with401Retry(Supplier<String> supplier) {
+    try {
+      return supplier.get();
+    } catch (RestClientResponseException e) {
+      if (e.getStatusCode().value() == 401) {
+        sessionCache.invalidateSession();
+        return supplier.get();
+      }
+      throw e;
+    }
   }
 
   /**
@@ -33,8 +54,10 @@ public class ArgoCDGitOpsService {
       @Nullable String repo,
       @Nullable String appNamespace,
       @Nullable String project) {
-    return argoCDQueries.listApplications(
-        name, refresh, projects, resourceVersion, selector, repo, appNamespace, project);
+    return with401Retry(
+        () ->
+            argoCDQueries.listApplications(
+                name, refresh, projects, resourceVersion, selector, repo, appNamespace, project));
   }
 
   /**
@@ -51,8 +74,10 @@ public class ArgoCDGitOpsService {
       @Nullable String repo,
       @Nullable String appNamespace,
       @Nullable String project) {
-    return argoCDQueries.getApplication(
-        name, refresh, projects, resourceVersion, selector, repo, appNamespace, project);
+    return with401Retry(
+        () ->
+            argoCDQueries.getApplication(
+                name, refresh, projects, resourceVersion, selector, repo, appNamespace, project));
   }
 
   /**
@@ -70,14 +95,19 @@ public class ArgoCDGitOpsService {
       @Nullable String kind,
       @Nullable String appNamespace,
       @Nullable String project) {
-    String resourceTree =
-        argoCDQueries.getResourceTree(
-            applicationName, namespace, name, version, group, kind, appNamespace, project);
-    String managedResources =
-        argoCDQueries.getManagedResources(
-            applicationName, namespace, name, version, group, kind, appNamespace, project);
-
-    return "Resource Tree: \n" + resourceTree + "\n---\nManaged Resources: \n" + managedResources;
+    return with401Retry(
+        () -> {
+          String resourceTree =
+              argoCDQueries.getResourceTree(
+                  applicationName, namespace, name, version, group, kind, appNamespace, project);
+          String managedResources =
+              argoCDQueries.getManagedResources(
+                  applicationName, namespace, name, version, group, kind, appNamespace, project);
+          return "Resource Tree: \n"
+              + resourceTree
+              + "\n---\nManaged Resources: \n"
+              + managedResources;
+        });
   }
 
   /** {@code GET /api/v1/applications/{name}/manifests}. */
@@ -89,18 +119,20 @@ public class ArgoCDGitOpsService {
       @Nullable List<String> sourcePositions,
       @Nullable List<String> revisions,
       @Nullable Boolean noCache) {
-    return argoCDQueries.getManifests(
-        name, revision, appNamespace, project, sourcePositions, revisions, noCache);
+    return with401Retry(
+        () ->
+            argoCDQueries.getManifests(
+                name, revision, appNamespace, project, sourcePositions, revisions, noCache));
   }
 
   /** {@code GET /api/v1/projects}. */
   public String listProjects(@Nullable String name) {
-    return argoCDQueries.listProjects(name);
+    return with401Retry(() -> argoCDQueries.listProjects(name));
   }
 
   /** {@code GET /api/v1/repositories}. */
   public String listRepositories(
       @Nullable String repo, @Nullable String forceRefresh, @Nullable String appProject) {
-    return argoCDQueries.listRepositories(repo, forceRefresh, appProject);
+    return with401Retry(() -> argoCDQueries.listRepositories(repo, forceRefresh, appProject));
   }
 }
