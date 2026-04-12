@@ -1,5 +1,6 @@
 package com.nilslee.mcp.service.gitops.auth;
 
+import com.nilslee.mcp.model.gitops.ArgoCdSessionResponse;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 

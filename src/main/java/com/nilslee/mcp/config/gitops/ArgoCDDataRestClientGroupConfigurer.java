@@ -4,6 +4,7 @@ import com.nilslee.mcp.service.gitops.auth.ArgoCDAuthQueries;
 import com.nilslee.mcp.service.gitops.auth.ArgoCDServiceAccountPasswordResolver;
 import com.nilslee.mcp.service.gitops.auth.ArgoCDSessionCache;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.support.RestClientHttpServiceGroupConfigurer;

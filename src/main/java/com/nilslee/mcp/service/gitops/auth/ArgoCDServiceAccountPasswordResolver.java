@@ -1,6 +1,9 @@
 package com.nilslee.mcp.service.gitops.auth;
 
 import com.nilslee.mcp.config.gitops.ArgoCDConfigurationProperties;
+import com.nilslee.mcp.model.gitops.ArgoCdSessionRequest;
+import com.nilslee.mcp.model.gitops.ArgoCdSessionResponse;
+import com.nilslee.mcp.model.gitops.ArgoCdUpdatePasswordRequest;
 import com.nilslee.mcp.service.cluster.ClusterResourceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -66,9 +66,9 @@ mcp:
       # Secret argocd-initial-admin-secret for an admin session, then PUT /account/password (see ArgoCDServiceAccountPasswordResolver).
       # bootstrap-admin-username: admin   # optional; default admin
       namespace: argocd
+      bootstrap-admin-username: admin
       service-account-name: mcp-service-account  # Service account created from argocd values
       initial-secret-name: argocd-initial-admin-secret  # Secret that contains initial admin password
       service-account-secret-name: mcp-service-account  # Secret name that contains new password for mcp service account. Created at runtime
-
 #    jenkins:
 

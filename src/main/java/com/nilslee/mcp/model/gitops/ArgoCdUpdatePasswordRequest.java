@@ -1,4 +1,4 @@
-package com.nilslee.mcp.service.gitops.auth;
+package com.nilslee.mcp.model.gitops;
 
 /**
  * JSON body for Argo CD {@code PUT /api/v1/account/password}.
