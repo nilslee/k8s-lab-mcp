@@ -1,8 +1,8 @@
-package com.nilslee.mcp.config.gitops;
+package com.nilslee.mcp.config.gitops.argocd;
 
-import com.nilslee.mcp.service.gitops.auth.ArgoCDAuthQueries;
-import com.nilslee.mcp.service.gitops.auth.ArgoCDServiceAccountPasswordResolver;
-import com.nilslee.mcp.service.gitops.auth.ArgoCDSessionCache;
+import com.nilslee.mcp.service.gitops.argocd.auth.ArgoCDAuthQueries;
+import com.nilslee.mcp.service.gitops.argocd.auth.ArgoCDServiceAccountPasswordResolver;
+import com.nilslee.mcp.service.gitops.argocd.auth.ArgoCDSessionCache;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.stereotype.Component;

@@ -1,4 +1,4 @@
-package com.nilslee.mcp.service.gitops.query;
+package com.nilslee.mcp.service.gitops.argocd.query;
 
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;

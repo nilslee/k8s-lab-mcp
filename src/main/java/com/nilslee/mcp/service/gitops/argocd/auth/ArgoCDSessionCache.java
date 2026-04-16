@@ -1,7 +1,7 @@
-package com.nilslee.mcp.service.gitops.auth;
+package com.nilslee.mcp.service.gitops.argocd.auth;
 
-import com.nilslee.mcp.model.gitops.ArgoCdSessionRequest;
-import com.nilslee.mcp.model.gitops.ArgoCdSessionResponse;
+import com.nilslee.mcp.model.gitops.argocd.ArgoCdSessionRequest;
+import com.nilslee.mcp.model.gitops.argocd.ArgoCdSessionResponse;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicReference;

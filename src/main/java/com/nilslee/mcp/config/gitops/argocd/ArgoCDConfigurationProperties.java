@@ -1,4 +1,4 @@
-package com.nilslee.mcp.config.gitops;
+package com.nilslee.mcp.config.gitops.argocd;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

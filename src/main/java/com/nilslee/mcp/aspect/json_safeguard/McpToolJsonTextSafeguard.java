@@ -1,4 +1,4 @@
-package com.nilslee.mcp.aspect;
+package com.nilslee.mcp.aspect.json_safeguard;
 
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;

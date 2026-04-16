@@ -1,4 +1,4 @@
-package com.nilslee.mcp.model.gitops;
+package com.nilslee.mcp.model.gitops.argocd;
 
 /**
  * JSON body for Argo CD {@code POST /api/v1/session}.

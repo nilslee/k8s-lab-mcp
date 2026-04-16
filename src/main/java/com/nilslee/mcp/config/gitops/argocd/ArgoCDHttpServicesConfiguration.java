@@ -1,7 +1,7 @@
-package com.nilslee.mcp.config.gitops;
+package com.nilslee.mcp.config.gitops.argocd;
 
-import com.nilslee.mcp.service.gitops.auth.ArgoCDAuthQueries;
-import com.nilslee.mcp.service.gitops.query.ArgoCDQueries;
+import com.nilslee.mcp.service.gitops.argocd.auth.ArgoCDAuthQueries;
+import com.nilslee.mcp.service.gitops.argocd.query.ArgoCDQueries;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.service.registry.ImportHttpServices;

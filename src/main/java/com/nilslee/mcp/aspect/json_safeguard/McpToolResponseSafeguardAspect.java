@@ -1,4 +1,4 @@
-package com.nilslee.mcp.aspect;
+package com.nilslee.mcp.aspect.json_safeguard;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;

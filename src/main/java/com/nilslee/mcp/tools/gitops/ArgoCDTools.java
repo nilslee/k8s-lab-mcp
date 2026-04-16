@@ -1,6 +1,6 @@
-package com.nilslee.mcp.tools;
+package com.nilslee.mcp.tools.gitops;
 
-import com.nilslee.mcp.service.gitops.ArgoCDGitOpsService;
+import com.nilslee.mcp.service.gitops.argocd.ArgoCDGitOpsService;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,16 +17,16 @@ import java.util.List;
  * @see ArgoCDGitOpsService
  */
 @Component
-public class GitOpsTools {
+public class ArgoCDTools {
 
-  private static final Logger log = LoggerFactory.getLogger(GitOpsTools.class);
+  private static final Logger log = LoggerFactory.getLogger(ArgoCDTools.class);
 
   private static final String CONTEXT =
       "For k8s-lab GitOps via Argo CD REST API. Returns Argo CD JSON as text. ";
 
   private final ArgoCDGitOpsService argoCDGitOpsService;
 
-  public GitOpsTools(ArgoCDGitOpsService argoCDGitOpsService) {
+  public ArgoCDTools(ArgoCDGitOpsService argoCDGitOpsService) {
     this.argoCDGitOpsService = argoCDGitOpsService;
   }
 

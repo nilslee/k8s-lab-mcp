@@ -1,7 +1,8 @@
-package com.nilslee.mcp.service.gitops;
+package com.nilslee.mcp.service.gitops.argocd;
 
-import com.nilslee.mcp.service.gitops.auth.ArgoCDSessionCache;
-import com.nilslee.mcp.service.gitops.query.ArgoCDQueries;
+import com.nilslee.mcp.service.gitops.argocd.auth.ArgoCDSessionCache;
+import com.nilslee.mcp.service.gitops.argocd.query.ArgoCDQueries;
+import com.nilslee.mcp.tools.gitops.ArgoCDTools;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientResponseException;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.function.Supplier;
 
 /**
- * Application service for Argo CD read operations used by {@link com.nilslee.mcp.tools.GitOpsTools}.
+ * Application service for Argo CD read operations used by {@link ArgoCDTools}.
  * Delegates to {@link ArgoCDQueries}; combines resource tree and managed resources for one MCP-facing call.
  */
 @Service

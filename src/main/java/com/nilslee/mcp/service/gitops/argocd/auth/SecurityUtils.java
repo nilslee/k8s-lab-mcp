@@ -1,4 +1,4 @@
-package com.nilslee.mcp.service.gitops.auth;
+package com.nilslee.mcp.service.gitops.argocd.auth;
 
 import org.springframework.stereotype.Service;
 

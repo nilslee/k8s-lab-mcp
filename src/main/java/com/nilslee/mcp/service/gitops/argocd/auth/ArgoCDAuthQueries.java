@@ -1,8 +1,8 @@
-package com.nilslee.mcp.service.gitops.auth;
+package com.nilslee.mcp.service.gitops.argocd.auth;
 
-import com.nilslee.mcp.model.gitops.ArgoCdSessionRequest;
-import com.nilslee.mcp.model.gitops.ArgoCdSessionResponse;
-import com.nilslee.mcp.model.gitops.ArgoCdUpdatePasswordRequest;
+import com.nilslee.mcp.model.gitops.argocd.ArgoCdSessionRequest;
+import com.nilslee.mcp.model.gitops.argocd.ArgoCdSessionResponse;
+import com.nilslee.mcp.model.gitops.argocd.ArgoCdUpdatePasswordRequest;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.service.annotation.HttpExchange;
