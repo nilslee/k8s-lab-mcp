@@ -28,7 +28,7 @@ import java.util.Optional;
  * progressive streams.
  */
 @Service
-@ConditionalOnProperty(prefix = "mcp.gitops.jenkins", name = "enabled", havingValue = "true")
+//@ConditionalOnProperty(prefix = "mcp.gitops.jenkins", name = "enabled", havingValue = "true")
 public class JenkinsCIGitOpsService {
 
   private static final int MAX_TAIL_LINES = 50_000;

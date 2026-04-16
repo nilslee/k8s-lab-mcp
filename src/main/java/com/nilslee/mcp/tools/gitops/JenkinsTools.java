@@ -17,7 +17,7 @@ import org.springframework.stereotype.Component;
  * @see JenkinsCIGitOpsService
  */
 @Component
-@ConditionalOnProperty(prefix = "mcp.gitops.jenkins", name = "enabled", havingValue = "true")
+//@ConditionalOnProperty(prefix = "mcp.gitops.jenkins", name = "enabled", havingValue = "true")
 public class JenkinsTools {
 
   private static final Logger log = LoggerFactory.getLogger(JenkinsTools.class);
