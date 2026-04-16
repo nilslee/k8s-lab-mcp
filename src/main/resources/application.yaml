@@ -20,7 +20,10 @@ spring:
         base-url: http://argocd.k8s.lab
         connect-timeout: 10s
         read-timeout: 30s
-#      jenkins:
+      jenkins:
+        base-url: http://jenkins.k8s.lab
+        connect-timeout: 10s
+        read-timeout: 30s
 
 
 
@@ -70,5 +73,7 @@ mcp:
       service-account-name: mcp-service-account  # Service account created from argocd values
       initial-secret-name: argocd-initial-admin-secret  # Secret that contains initial admin password
       service-account-secret-name: mcp-service-account  # Secret name that contains new password for mcp service account. Created at runtime
-#    jenkins:
+    jenkins:
+      # When true, Jenkins MCP tools and JenkinsCIGitOpsService load; requires HTTP @HttpExchange beans for Jenkins query APIs.
+      enabled: false
 
