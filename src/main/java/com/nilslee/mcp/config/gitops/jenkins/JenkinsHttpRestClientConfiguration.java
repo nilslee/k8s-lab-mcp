@@ -34,8 +34,12 @@ import org.springframework.web.service.registry.ImportHttpServices;
 public class JenkinsHttpRestClientConfiguration {
 
   @Bean
-  RestClientHttpServiceGroupConfigurer jenkinsHttpServiceGroupConfigurer() {
+  RestClientHttpServiceGroupConfigurer jenkinsHttpServiceGroupConfigurer(JenkinsConfigurationProperties props) {
     return groups ->
-        groups.filterByName("jenkins").forEachClient((group, clientBuilder) -> {});
+        groups.filterByName("jenkins").forEachClient((group, clientBuilder) -> {
+          clientBuilder.defaultHeaders(httpHeaders -> {
+            httpHeaders.setBasicAuth(props.username(), props.password());
+          });
+        });
   }
 }

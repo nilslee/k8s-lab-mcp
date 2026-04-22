@@ -17,6 +17,10 @@ import org.springframework.boot.context.properties.bind.DefaultValue;
 @ConfigurationProperties("mcp.gitops.jenkins")
 public record JenkinsConfigurationProperties(
     @DefaultValue("false") boolean enabled,
+
+    @DefaultValue("admin") String username,
+    @DefaultValue("admin") String password,
+
     /** Maximum characters accumulated from progressive console before truncation. */
     @DefaultValue("1048576") int maxLogChars,
     /** Maximum progressiveText HTTP round-trips per log fetch (guards stuck {@code X-More-Data}). */

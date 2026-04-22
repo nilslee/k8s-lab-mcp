@@ -73,7 +73,9 @@ mcp:
       service-account-name: mcp-service-account  # Service account created from argocd values
       initial-secret-name: argocd-initial-admin-secret  # Secret that contains initial admin password
       service-account-secret-name: mcp-service-account  # Secret name that contains new password for mcp service account. Created at runtime
-#    jenkins:
+    jenkins:
+      username: admin
+      password: admin
 #      # When true, Jenkins MCP tools and JenkinsCIGitOpsService load; requires HTTP @HttpExchange beans for Jenkins query APIs.
 #      enabled: true
 
