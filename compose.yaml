@@ -1,0 +1,51 @@
+services:
+  db:
+    image: postgres:18.3-trixie
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: diagnostics
+      # Jenkins: POSTGRES = credentials('mcp-postgres') → POSTGRES_USR / POSTGRES_PSW
+      POSTGRES_USER: ${POSTGRES_USR:-mcp}
+      POSTGRES_PASSWORD: ${POSTGRES_PSW:-mcp}
+    ports:
+      - "5432:5432"            # Maps Host Port:Container Port
+    volumes:
+      - postgres_data:/var/lib/postgresql # Persists data between restarts
+    healthcheck:
+      # $$ so compose leaves $POSTGRES_USER for the container shell (matches POSTGRES_USER above)
+      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mcp-server:
+    image: ${IMAGE_NAME}
+    container_name: ${CONTAINER_NAME}
+    restart: unless-stopped
+    network_mode: host
+    mem_limit: 512m
+    memswap_limit: 512m
+    environment:
+      SPRING_PROFILES_ACTIVE: runner
+      GRAFANA_USERNAME: ${GRAFANA_LOKI_USR}
+      GRAFANA_PASSWORD: ${GRAFANA_LOKI_PSW}
+    volumes:
+      - ${KUBECONFIG_PATH}:/app/kubeconfig:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "8080:80"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:      #  Named volume for persistent storage
+#   - ./init.sql:/docker-entrypoint-initdb.d/init.sql
