@@ -12,8 +12,8 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql # Persists data between restarts
     healthcheck:
-      # $$ so compose leaves $POSTGRES_USER for the container shell (matches POSTGRES_USER above)
-      test: [ "CMD-SHELL", "pg_isready -U $$POSTGRES_USER" ]
+      # pg_isready defaults -d to the username; only POSTGRES_DB exists (e.g. diagnostics), so pass -d explicitly.
+      test: [ "CMD-SHELL", "pg_isready -U \"$$POSTGRES_USER\" -d \"$$POSTGRES_DB\"" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,8 +27,9 @@ services:
     memswap_limit: 512m
     environment:
       SPRING_PROFILES_ACTIVE: runner
-      GRAFANA_USERNAME: ${GRAFANA_LOKI_USR}
-      GRAFANA_PASSWORD: ${GRAFANA_LOKI_PSW}
+      # :- avoids compose warnings when vars unset (e.g. docker compose logs from a shell without Jenkins creds)
+      GRAFANA_USERNAME: ${GRAFANA_LOKI_USR:-}
+      GRAFANA_PASSWORD: ${GRAFANA_LOKI_PSW:-}
     volumes:
       - ${KUBECONFIG_PATH}:/app/kubeconfig:ro
     depends_on:
@@ -40,8 +41,9 @@ services:
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin
+    # Default 8090: Jenkins controller binds 127.0.0.1:8080 on runner-ci — do not publish pgAdmin on 8080.
     ports:
-      - "8080:80"
+      - "${PGADMIN_HOST_PORT:-8090}:80"
     depends_on:
       db:
         condition: service_healthy
